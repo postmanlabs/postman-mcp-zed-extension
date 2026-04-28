@@ -1,0 +1,12 @@
+{
+  // Your Postman API key (required).
+  // Get one at: https://postman.postman.co/settings/me/api-keys
+  "postman_api_key": "",
+
+  // Tool configuration: "minimal" (default), "full", or "code"
+  //
+  // minimal — essential tools for collections, workspaces, environments (fastest)
+  // full    — all 100+ Postman API tools (complete access)
+  // code    — API search and client code generation from specs
+  "tool_config": "minimal"
+}

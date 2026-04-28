@@ -1,0 +1,10 @@
+id = "postman-context-server"
+name = "Postman MCP Server"
+description = "Connect AI tools to Postman — manage collections, workspaces, environments, and APIs through natural language."
+version = "1.0.0"
+schema_version = 1
+authors = ["Postman <support@postman.com>"]
+repository = "https://github.com/postmanlabs/postman-mcp-zed-extension"
+
+[context_servers.postman]
+name = "Postman MCP Server"
