@@ -2,7 +2,7 @@
 
 A [Zed](https://zed.dev/) context server extension that connects the Zed AI Agent to your [Postman](https://postman.com) workspace via the [Postman MCP Server](https://github.com/postmanlabs/postman-mcp-server).
 
-> **Source**: https://github.com/postmanlabs/postmanlabs-postman-mcp-zed-extension
+> **Source**: https://github.com/postmanlabs/postman-mcp-zed-extension
 
 ## Installation
 
