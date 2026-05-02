@@ -13,25 +13,25 @@ struct PostmanSettings {
     /// Get one at: https://postman.postman.co/settings/me/api-keys
     postman_api_key: String,
 
-    /// Tool configuration to load.
+    /// Toolset to load.
     /// - "minimal" (default): essential tools, fastest performance
     /// - "full": all 100+ Postman API tools
     /// - "code": API search and client code generation tools
-    #[serde(default = "default_tool_config")]
-    tool_config: ToolConfig,
+    #[serde(default = "default_toolset")]
+    toolset: Toolset,
 }
 
 #[derive(Debug, Deserialize, JsonSchema, Default)]
 #[serde(rename_all = "lowercase")]
-enum ToolConfig {
+enum Toolset {
     #[default]
     Minimal,
     Full,
     Code,
 }
 
-fn default_tool_config() -> ToolConfig {
-    ToolConfig::Minimal
+fn default_toolset() -> Toolset {
+    Toolset::Minimal
 }
 
 struct PostmanExtension;
@@ -63,10 +63,10 @@ impl zed::Extension for PostmanExtension {
             );
         }
 
-        let tool_flag = match settings.tool_config {
-            ToolConfig::Full => "--full",
-            ToolConfig::Code => "--code",
-            ToolConfig::Minimal => "--minimal",
+        let tool_flag = match settings.toolset {
+            Toolset::Full => "--full",
+            Toolset::Code => "--code",
+            Toolset::Minimal => "--minimal",
         };
 
         Ok(Command {
