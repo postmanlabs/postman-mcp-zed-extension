@@ -18,7 +18,7 @@ Add to your Zed settings (`~/.config/zed/settings.json`):
     "postman": {
       "settings": {
         "postman_api_key": "YOUR_API_KEY",
-        "tool_config": "minimal"
+        "toolset": "minimal"
       }
     }
   }
@@ -27,10 +27,10 @@ Add to your Zed settings (`~/.config/zed/settings.json`):
 
 Get your API key at [postman.postman.co/settings/me/api-keys](https://postman.postman.co/settings/me/api-keys).
 
-## Tool Configurations
+## Toolset
 
-| Config | Description |
-|--------|-------------|
+| Value | Description |
+|-------|-------------|
 | `minimal` (default) | Essential tools for collections, workspaces, environments |
 | `full` | All 100+ Postman API tools |
 | `code` | API search and client code generation |
