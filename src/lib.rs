@@ -34,6 +34,25 @@ fn default_toolset() -> Toolset {
     Toolset::Minimal
 }
 
+// Common npx locations for macOS (Homebrew, nvm, system) and Linux.
+// Zed GUI apps don't inherit the shell PATH, so we probe known paths.
+const NPX_CANDIDATE_PATHS: &[&str] = &[
+    "/opt/homebrew/bin/npx",
+    "/usr/local/bin/npx",
+    "/usr/bin/npx",
+    // nvm default locations
+    "/Users/Shared/.nvm/versions/node/default/bin/npx",
+];
+
+fn find_npx() -> String {
+    for path in NPX_CANDIDATE_PATHS {
+        if std::fs::metadata(path).is_ok() {
+            return path.to_string();
+        }
+    }
+    "npx".to_string()
+}
+
 struct PostmanExtension;
 
 impl zed::Extension for PostmanExtension {
@@ -69,8 +88,10 @@ impl zed::Extension for PostmanExtension {
             Toolset::Minimal => "--minimal",
         };
 
+        let npx = find_npx();
+
         Ok(Command {
-            command: "npx".into(),
+            command: npx,
             args: vec![
                 "-y".into(),
                 format!("{}@latest", NPM_PACKAGE),
