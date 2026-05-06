@@ -45,7 +45,6 @@ Get your API key at [postman.postman.co/settings/me/api-keys](https://postman.po
 
 ## Requirements
 
-- Node.js 18+ (for `npx`)
 - A Postman API key
 
 ## Links

@@ -1,12 +1,13 @@
 use schemars::JsonSchema;
 use serde::Deserialize;
+use std::env;
 use zed::settings::ContextServerSettings;
 use zed_extension_api::{
     self as zed, serde_json, Command, ContextServerConfiguration, ContextServerId, Project, Result,
 };
 
-const NPM_PACKAGE: &str = "@postman/postman-mcp-server";
-const NPM_PACKAGE_VERSION: &str = "2.8.7";
+const PACKAGE_NAME: &str = "@postman/postman-mcp-server";
+const SERVER_PATH: &str = "node_modules/@postman/postman-mcp-server/dist/src/index.js";
 
 #[derive(Debug, Deserialize, JsonSchema)]
 struct PostmanSettings {
@@ -47,6 +48,13 @@ impl zed::Extension for PostmanExtension {
         _context_server_id: &ContextServerId,
         project: &Project,
     ) -> Result<Command> {
+        let latest_version = zed::npm_package_latest_version(PACKAGE_NAME)?;
+        let installed_version = zed::npm_package_installed_version(PACKAGE_NAME)?;
+
+        if installed_version.as_deref() != Some(latest_version.as_ref()) {
+            zed::npm_install_package(PACKAGE_NAME, &latest_version)?;
+        }
+
         let settings = ContextServerSettings::for_project("postman", project)?;
         let Some(settings) = settings.settings else {
             return Err(
@@ -70,17 +78,16 @@ impl zed::Extension for PostmanExtension {
             Toolset::Minimal => "--minimal",
         };
 
-        // Run via sh so stderr from npx/npm is suppressed and cannot interfere
-        // with Zed's reading of the MCP JSON-RPC stream on stdout.
+        let node_path = zed::node_binary_path()?;
+        let server_path = env::current_dir()
+            .unwrap()
+            .join(SERVER_PATH)
+            .to_string_lossy()
+            .to_string();
+
         Ok(Command {
-            command: "/bin/sh".into(),
-            args: vec![
-                "-c".into(),
-                format!(
-                    "exec npx -y {}@{} {} 2>/dev/null",
-                    NPM_PACKAGE, NPM_PACKAGE_VERSION, tool_flag
-                ),
-            ],
+            command: node_path,
+            args: vec![server_path, tool_flag.into()],
             env: vec![("POSTMAN_API_KEY".into(), settings.postman_api_key)],
         })
     }
