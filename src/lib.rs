@@ -35,25 +35,6 @@ fn default_toolset() -> Toolset {
     Toolset::Minimal
 }
 
-// Common npx locations for macOS (Homebrew, nvm, system) and Linux.
-// Zed GUI apps don't inherit the shell PATH, so we probe known paths.
-const NPX_CANDIDATE_PATHS: &[&str] = &[
-    "/opt/homebrew/bin/npx",
-    "/usr/local/bin/npx",
-    "/usr/bin/npx",
-    // nvm default locations
-    "/Users/Shared/.nvm/versions/node/default/bin/npx",
-];
-
-fn find_npx() -> String {
-    for path in NPX_CANDIDATE_PATHS {
-        if std::fs::metadata(path).is_ok() {
-            return path.to_string();
-        }
-    }
-    "npx".to_string()
-}
-
 struct PostmanExtension;
 
 impl zed::Extension for PostmanExtension {
@@ -89,14 +70,16 @@ impl zed::Extension for PostmanExtension {
             Toolset::Minimal => "--minimal",
         };
 
-        let npx = find_npx();
-
+        // Run via sh so stderr from npx/npm is suppressed and cannot interfere
+        // with Zed's reading of the MCP JSON-RPC stream on stdout.
         Ok(Command {
-            command: npx,
+            command: "/bin/sh".into(),
             args: vec![
-                "-y".into(),
-                format!("{}@{}", NPM_PACKAGE, NPM_PACKAGE_VERSION),
-                tool_flag.into(),
+                "-c".into(),
+                format!(
+                    "exec npx -y {}@{} {} 2>/dev/null",
+                    NPM_PACKAGE, NPM_PACKAGE_VERSION, tool_flag
+                ),
             ],
             env: vec![("POSTMAN_API_KEY".into(), settings.postman_api_key)],
         })
