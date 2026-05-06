@@ -94,7 +94,7 @@ impl zed::Extension for PostmanExtension {
             command: npx,
             args: vec![
                 "-y".into(),
-                format!("{}@latest", NPM_PACKAGE),
+                NPM_PACKAGE.into(),
                 tool_flag.into(),
             ],
             env: vec![("POSTMAN_API_KEY".into(), settings.postman_api_key)],
