@@ -6,6 +6,7 @@ use zed_extension_api::{
 };
 
 const NPM_PACKAGE: &str = "@postman/postman-mcp-server";
+const NPM_PACKAGE_VERSION: &str = "2.8.7";
 
 #[derive(Debug, Deserialize, JsonSchema)]
 struct PostmanSettings {
@@ -94,7 +95,7 @@ impl zed::Extension for PostmanExtension {
             command: npx,
             args: vec![
                 "-y".into(),
-                NPM_PACKAGE.into(),
+                format!("{}@{}", NPM_PACKAGE, NPM_PACKAGE_VERSION),
                 tool_flag.into(),
             ],
             env: vec![("POSTMAN_API_KEY".into(), settings.postman_api_key)],
