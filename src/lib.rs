@@ -21,6 +21,15 @@ struct PostmanSettings {
     /// - "code": API search and client code generation tools
     #[serde(default = "default_toolset")]
     toolset: Toolset,
+
+    /// Whether to send anonymous usage telemetry to Postman.
+    /// Enabled by default. Set to false to opt out.
+    #[serde(rename = "telemetryEnabled", default = "default_telemetry_enabled")]
+    telemetry_enabled: bool,
+}
+
+fn default_telemetry_enabled() -> bool {
+    true
 }
 
 #[derive(Debug, Deserialize, JsonSchema, Default)]
@@ -58,7 +67,8 @@ impl zed::Extension for PostmanExtension {
         let settings = ContextServerSettings::for_project("postman", project)?;
         let Some(settings) = settings.settings else {
             return Err(
-                "Set postman_api_key in the Postman MCP Server extension settings. \
+                "Postman API key not set. Open the Postman extension's Configure panel \
+                 and paste your key into postman_api_key. \
                  Get a key at https://postman.postman.co/settings/me/api-keys"
                     .into(),
             );
@@ -68,7 +78,10 @@ impl zed::Extension for PostmanExtension {
 
         if settings.postman_api_key.trim().is_empty() {
             return Err(
-                "postman_api_key is required. Get a key at https://postman.postman.co/settings/me/api-keys".into(),
+                "postman_api_key is required. Open the Postman extension's Configure panel \
+                 and paste your key into postman_api_key. \
+                 Get a key at https://postman.postman.co/settings/me/api-keys"
+                    .into(),
             );
         }
 
@@ -88,7 +101,13 @@ impl zed::Extension for PostmanExtension {
         Ok(Command {
             command: node_path,
             args: vec![server_path, tool_flag.into()],
-            env: vec![("POSTMAN_API_KEY".into(), settings.postman_api_key)],
+            env: vec![
+                ("POSTMAN_API_KEY".into(), settings.postman_api_key),
+                (
+                    "POSTMAN_MCP_TELEMETRY".into(),
+                    settings.telemetry_enabled.to_string(),
+                ),
+            ],
         })
     }
 
